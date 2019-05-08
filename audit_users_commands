@@ -1,0 +1,4 @@
+# this command tracks all the logged-in users command an appends to a file '/var/log/commands.log'
+# Append the following lines on '/etc/profile'
+CURRENT_SSH_CLIENT=$(echo $SSH_CLIENT | awk '{print $1}')
+export PROMPT_COMMAND='RETRN_VAL=$?;logger -p local6.debug "user:$(whoami) pid:$$ command=\"$(history 1 | sed "s/^[ ]*[0-9]\+[ ]*//" )\" category:audit type:user_command retval:$RETRN_VAL client_ip:$CURRENT_SSH_CLIENT"'
