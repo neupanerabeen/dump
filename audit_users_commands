@@ -1,4 +1,21 @@
 # this command tracks all the logged-in users command an appends to a file '/var/log/commands.log'
+
 # Append the following lines on '/etc/profile'
+# note that I am using local6.debug
+
 CURRENT_SSH_CLIENT=$(echo $SSH_CLIENT | awk '{print $1}')
+if[ "$CURRENT_SSH_CLIENT" == "" ]; then $CURRENT_SSH_CLIENT="localhost"; fi
+
 export PROMPT_COMMAND='RETRN_VAL=$?;logger -p local6.debug "user:$(whoami) pid:$$ command=\"$(history 1 | sed "s/^[ ]*[0-9]\+[ ]*//" )\" category:audit type:user_command retval:$RETRN_VAL client_ip:$CURRENT_SSH_CLIENT"'
+
+
+#Append if not create the file :/etc/rsyslog.d/bash.conf
+# this will forward all the local6 logs to the file /var/log/commands.log
+local6.*    /var/log/commands.log
+# Also, this will forward all the local6 logs to remote server with IP: 1.1.1.1 on port 514
+local6.*    @1.1.1.1:514
+
+
+
+#restart rsyslog service to reload new config
+sudo service rsyslog restart
